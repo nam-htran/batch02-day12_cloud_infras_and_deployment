@@ -1,7 +1,7 @@
 # Deployment Information
 
 ## Public URL
-https://vinai-day12-production-6dac.up.railway.app
+https://batch02-day12cloudinfrasanddeployment-production-32e0.up.railway.app
 
 ## Platform
 Railway
@@ -10,13 +10,13 @@ Railway
 
 ### Health Check
 ```bash
-curl https://vinai-day12-production-6dac.up.railway.app/health
+curl https://batch02-day12cloudinfrasanddeployment-production-32e0.up.railway.app/health
 # Expected: {"status": "ok", "message": "Container is alive"}
 ```
 
 ### API Test (with authentication)
 ```bash
-curl -X POST https://vinai-day12-production-6dac.up.railway.app/ask \
+curl -X POST https://batch02-day12cloudinfrasanddeployment-production-32e0.up.railway.app/ask \
   -H "X-API-Key: secret-key-123" \
   -H "Content-Type: application/json" \
   -d '{"question": "Hello"}'
@@ -30,6 +30,6 @@ curl -X POST https://vinai-day12-production-6dac.up.railway.app/ask \
 - MONTHLY_BUDGET_USD=10.0
 
 ## Screenshots
-- [Deployment dashboard](screenshots/dashboard.png)
-- [Service running](screenshots/running.png)
-- [Test results](screenshots/test.png)
+- [Deployment dashboard](assets/dashboard.png)
+- [Service running](assets/running.png)
+- [Test results](assets/test.png)
