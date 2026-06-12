@@ -38,3 +38,7 @@ streamlit>=1.35.0
 deepeval>=1.0.0
 # ragas>=0.1.0           # Alternative
 # trulens>=1.0.0         # Alternative
+fastapi
+uvicorn
+redis>=5.0.0
+pydantic-settings

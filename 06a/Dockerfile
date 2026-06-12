@@ -16,13 +16,18 @@ COPY --from=builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/pyth
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
 COPY . /app/
-RUN chown -R appuser:appuser /app
+RUN chown -R appuser:appuser /app && chmod +x /app/start.sh
 
 USER appuser
 
 ENV PYTHONPATH=/app
-ENV PORT=8501
+ENV PORT=8000
+ENV STREAMLIT_PORT=8501
 
 EXPOSE $PORT
+EXPOSE $STREAMLIT_PORT
 
-CMD ["sh", "-c", "streamlit run app.py --server.port $PORT --server.address 0.0.0.0"]
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:' + os.environ.get('PORT', '8000') + '/health')" || exit 1
+
+CMD ["/app/start.sh"]
