@@ -1,7 +1,7 @@
 # Deployment Information
 
 ## Public URL
-https://batch02-day12cloudinfrasanddeployment-production-32e0.up.railway.app
+https://day12-deplayed-production.up.railway.app
 
 ## Platform
 Railway
@@ -10,13 +10,13 @@ Railway
 
 ### Health Check
 ```bash
-curl https://batch02-day12cloudinfrasanddeployment-production-32e0.up.railway.app/health
+curl https://day12-deplayed-production.up.railway.app/health
 # Expected: {"status": "ok", "message": "Container is alive"}
 ```
 
 ### API Test (with authentication)
 ```bash
-curl -X POST https://batch02-day12cloudinfrasanddeployment-production-32e0.up.railway.app/ask \
+curl -X POST https://day12-deplayed-production.up.railway.app/ask \
   -H "X-API-Key: secret-key-123" \
   -H "Content-Type: application/json" \
   -d '{"question": "Hello"}'
