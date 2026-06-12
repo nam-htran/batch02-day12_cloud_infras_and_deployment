@@ -32,7 +32,7 @@ jobs:
     - name: Run Unit Tests with Coverage
       run: |
         cd 06-lab-complete
-        pytest tests/ --cov=app --cov-report=term-missing
+        PYTHONPATH=. pytest tests/ --cov=app --cov-report=term-missing
 
   build-docker:
     name: Build Docker Image
