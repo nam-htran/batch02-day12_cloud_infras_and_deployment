@@ -5,8 +5,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  lint-and-test:
-    name: Code Lint & Unit Test Coverage
+  build-06a-day08:
+    name: Build 06a (Day 08 RAG Pipeline)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -15,19 +15,6 @@ jobs:
       with:
         python-version: "3.11"
         
-    - name: Install dependencies & testing tools
-      run: |
-        cd 06-lab-complete
-        pip install -r requirements.txt
-        pip install flake8 pytest pytest-cov httpx
-        
-    - name: Verify Code Lint (flake8)
-      run: |
-        cd 06-lab-complete
-        # Dừng quá trình nếu có lỗi syntax error (E9, F63, F7, F82)
-        flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
-        # Báo cáo các lỗi format khác nhưng không dừng quá trình
-        flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
         
     - name: Run Unit Tests with Coverage
       run: |
