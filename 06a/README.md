@@ -1,87 +1,117 @@
-# Lab Assignment Day 09: A2A Supervisor - Workers Architecture
+# Group Project - Search Engine / RAG Chatbot
 
-Dự án này là bài tập nâng cấp hệ thống RAG Pipeline (Day 08) lên cấu trúc **Multi-Agent (Supervisor - Workers)** giao tiếp qua giao thức HTTP (A2A Protocol).
+## Goal
 
----
+Build a RAG chatbot for questions about Vietnamese drug prevention law and
+related news. The group project is split into four modules, all connected by
+the shared contract in `group_project/system_contracts.py`.
 
-## Kiến trúc Hệ thống
+## Members
 
-Hệ thống được thiết kế theo mô hình phân tán, tách biệt từng Agent thành một Microservice độc lập:
+| Member | Student ID | Module | Path |
+|--------|------------|--------|------|
+| Le Dam Quan | 2A202600930 | Chat UI / UX | `src/module_chat_ui/` |
+| Nguyen Tien Dat | 2A202600595 | RAG Core | `src/module_rag_core/` |
+| Tran Nguyen Dang Khoa | 2A202600922 | Dataset Creator | `src/module_dataset_creator/` |
+| Tran Hoang Nam | 2A202600870 | Evaluation | `src/module_evaluation/` |
 
-1. **Supervisor Agent (Port 10100):** Đóng vai trò làm bộ định tuyến (Router/Orchestrator). Nhận câu hỏi từ Streamlit UI, phân tích ý định (Intent) và gửi yêu cầu (HTTP POST) đến Worker Agent phù hợp nhất.
-2. **Legal RAG Agent (Port 10101):** Worker số 1. Chuyên gia luật pháp. Kết nối với Vector DB Weaviate để thực hiện truy vấn RAG về luật phòng chống ma túy.
-3. **Web Search Agent (Port 10102):** Worker số 2. Chuyên gia tìm kiếm thông tin bên ngoài. Nhận các câu hỏi về tin tức đời sống và xã hội.
-4. **Synthesizer Agent (Port 10103):** Worker số 3. Xử lý các câu chào hỏi giao tiếp thông thường hoặc đóng vai trò fallback khi các hệ thống khác gặp lỗi.
-
-```mermaid
-graph TD
-    UI[💻 Streamlit UI] -->|HTTP POST| SUP[🧠 Supervisor Agent :10100]
-
-    subgraph Distributed A2A Workers
-    SUP -->|Routing| RAG[⚖️ Legal RAG Agent :10101]
-    SUP -->|Routing| WEB[🌐 Web Search Agent :10102]
-    SUP -->|Routing| SYN[✍️ Synthesizer Agent :10103]
-    RAG -->|Vector Search| DB[(📚 Weaviate DB)]
-    RAG -.->|Fallback| SYN
-    WEB -.->|Fallback| SYN
-    end
-```
-
----
-
-## Cấu trúc thư mục
+## Architecture
 
 ```text
-Lab_Assignment/
-├── a2a_system/                  # Code của 4 FastAPI Server (Các Agents)
-│   ├── supervisor_agent.py
-│   ├── legal_rag_agent.py
-│   ├── web_search_agent.py
-│   └── synthesizer_agent.py
-├── group_project/               # Code Giao diện Streamlit & RAG Core
-│   ├── app.py
-│   └── src/
-│       └── module_rag_core/     # Lõi xử lý LLM (Sử dụng OpenRouter)
-├── day08_optimize.sh            # Script khởi động 4 Server chạy ngầm
-├── .env                         # Chứa API Key (OPENROUTER_API_KEY)
-└── README.md
+Streamlit UI
+  -> RAGCoreInterface
+  -> RAG Core
+       -> retrieval / reranking / generation
+  -> RAGAnswer(answer, sources, standalone_query)
+
+Golden Dataset
+  -> Evaluation Pipeline
+       -> config A: hybrid + reranker
+       -> config B: question-only + no reranker
+  -> results.md + REPORT.md
 ```
 
----
+## Module Layout
 
-## Cài đặt & Khởi chạy
+```text
+group_project/
+|-- app.py
+|-- system_contracts.py
+|-- README.md
+|-- REPORT.md
+|-- src/
+|   |-- module_chat_ui/
+|   |-- module_dataset_creator/
+|   |-- module_evaluation/
+|   `-- module_rag_core/
+`-- tests/
+```
 
-### 1. Cài đặt thư viện
-Hệ thống sử dụng `uv` để quản lý môi trường. Hãy đảm bảo cài đặt đủ các gói trong `requirements.txt`:
+## Integration Contract
+
+`system_contracts.py` defines:
+
+- `RAGConfig`
+- `Document`
+- `ChatMessage`
+- `RAGAnswer`
+- `RAGCoreInterface`
+
+The UI and evaluation modules call only `RAGCoreInterface`. This keeps each
+member's module replaceable without rewriting the rest of the app.
+
+## Run Chat UI
+
+From the repository root:
+
 ```bash
-uv pip install -r requirements.txt
-uv pip install fastapi uvicorn requests python-dotenv langchain-openai
+streamlit run group_project/app.py
 ```
 
-### 2. Cấu hình môi trường
-Đảm bảo đã có file `.env` chứa OpenRouter API Key nằm tại thư mục gốc của `Lab_Assignment`.
-```env
-OPENROUTER_API_KEY="sk-or-v1-..."
-```
+The UI tries to load `src.module_rag_core.rag_engine.RAGCoreEngine`. If Gemini,
+Weaviate, or API keys are unavailable, the integrated RAG core falls back to
+offline demo documents so the chat flow still works for local testing.
 
-### 3. Khởi động Backend Servers (Các Agents)
-Mở một terminal (Nên dùng Git Bash hoặc WSL), di chuyển vào thư mục `Lab_Assignment` và chạy:
+## Run Dataset Validation
+
 ```bash
-bash day08_optimize.sh
+python group_project/src/module_dataset_creator/validate_schema.py
 ```
-Hệ thống sẽ chạy ngầm cả 4 cổng mạng: `10100`, `10101`, `10102`, `10103`.
 
-### 4. Khởi động Giao diện người dùng
-Giữ nguyên terminal đang chạy server. Mở một **Terminal mới**, di chuyển vào `Lab_Assignment` và chạy:
+## Run Evaluation
+
 ```bash
-uv run streamlit run group_project/app.py
+python group_project/src/module_evaluation/eval_pipeline.py
 ```
-Mở trình duyệt ở địa chỉ `http://localhost:8501` để trải nghiệm hệ thống Multi-Agent của bạn!
 
----
+Outputs:
 
-## Cải tiến nổi bật so với Day 08
-- Tách rời mã nguồn của Streamlit UI và RAG Engine, giúp hệ thống không bị block.
-- Sử dụng mô hình `Supervisor` để phân chia công việc rõ ràng, LLM chỉ tập trung vào một nhiệm vụ chuyên môn duy nhất.
-- Hỗ trợ cơ chế **Fallback**: Khi RAG Agent hỏng mạng (lỗi Weaviate / OpenRouter), request sẽ tự động fallback về Synthesizer Agent để phản hồi lỗi thay vì treo toàn bộ Server.
-- Cấu hình file `sh` tiện dụng, sử dụng trap signal để tự động cleanup tắt toàn bộ process ngầm khi nhấn `Ctrl + C`.
+- `group_project/src/module_evaluation/results.md`
+- `group_project/REPORT.md`
+
+## Import Data To Weaviate
+
+After `data/standardized/legal` and `data/standardized/news` are available,
+load them into the RAG core vector store with:
+
+```bash
+python group_project/import_data.py
+```
+
+The script reads `GEMINI_API_KEY`, `WEAVIATE_URL`, and `WEAVIATE_API_KEY` from
+`.env`. If Gemini is not configured, it uses zero vectors so the import flow can
+still be tested.
+
+## Run Integration Test
+
+```bash
+pytest group_project/tests/test_system_integration.py -v
+```
+
+## Current Status
+
+- Dataset creator has a 15+ item golden dataset and schema validator.
+- RAG core is integrated from Nguyen Tien Dat's branch with offline-safe
+  Gemini and Weaviate fallbacks plus a Weaviate import script.
+- Chat UI loads the shared RAG core through `RAGCoreInterface`.
+- Evaluation has 4 metrics, 2 A/B configs, and worst-performer reporting.
