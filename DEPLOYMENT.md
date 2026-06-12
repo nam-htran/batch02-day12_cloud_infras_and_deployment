@@ -6,28 +6,19 @@ https://day12-deplayed-production.up.railway.app
 ## Platform
 Railway
 
-## Test Commands
+## Test Instructions
+This is a Streamlit Web Application. To test the deployment:
+1. Open your web browser and navigate to: `https://day12-deplayed-production.up.railway.app`
+2. Ensure the Chat UI loads successfully.
+3. Try asking a question to verify the integrated RAG core is functioning.
 
-### Health Check
-```bash
-curl https://day12-deplayed-production.up.railway.app/health
-# Expected: {"status": "ok", "message": "Container is alive"}
-```
-
-### API Test (with authentication)
-```bash
-curl -X POST https://day12-deplayed-production.up.railway.app/ask \
-  -H "X-API-Key: secret-key-123" \
-  -H "Content-Type: application/json" \
-  -d '{"question": "Hello"}'
-```
+*(Note: Streamlit apps do not have standard `/health` or `/ask` API endpoints. You interact with it directly via the UI)*
 
 ## Environment Variables Set
-- PORT=8000
-- REDIS_URL=redis://localhost:6379/0 (Using internal Railway Redis)
-- AGENT_API_KEY=secret-key-123
-- RATE_LIMIT_PER_MINUTE=10
-- MONTHLY_BUDGET_USD=10.0
+- PORT (Assigned by Railway)
+- WEAVIATE_URL (If using external Weaviate)
+- GEMINI_API_KEY=***
+- OPENROUTER_API_KEY=***
 
 ## Screenshots
 - [Deployment dashboard](assets/dashboard.png)
