@@ -45,19 +45,4 @@ jobs:
         cd 06-lab-complete
         docker build -t app-06 .
 
-  deploy-railway:
-    name: Continuous Deployment (CD) to Railway
-    needs: build-docker
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-    - uses: actions/checkout@v4
-    - name: Install Railway CLI
-      run: npm i -g @railway/cli
-    - name: Deploy to Railway via CLI
-      run: |
-        cd 06-lab-complete
-        railway up --detach
-      env:
-        # Anh cần tạo token trên Railway và nạp vào GitHub Secrets với tên RAILWAY_TOKEN
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
