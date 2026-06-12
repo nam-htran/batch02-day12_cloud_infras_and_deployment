@@ -1,11 +1,8 @@
-__pycache__/
+__pycache__
 *.pyc
 .env
-.env.*
-!.env.example
+.git
+.github
+.vscode
 venv/
 .venv/
-.git/
-*.md
-tests/
-.DS_Store
