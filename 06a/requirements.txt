@@ -25,6 +25,12 @@ rank-bm25>=0.2.2
 # Task 8 - PageIndex
 pageindex>=0.1.0
 
+# Backend Server (FastAPI)
+fastapi
+uvicorn
+langchain-openai
+langchain-core
+
 # Task 10 - Generation
 openai>=1.30.0
 google-generativeai>=0.5.0  # Gemini adapter for group RAG core
