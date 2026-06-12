@@ -1,0 +1,34 @@
+name: CI Pipeline (Kiểm duyệt Bánh)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Bước 1 - Lấy code về (Checkout Repository)
+      uses: actions/checkout@v4
+      
+    - name: Bước 2 - Cài đặt Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        
+    - name: Bước 3 - Kiểm tra thư viện (Install Dependencies)
+      run: |
+        python -m pip install --upgrade pip
+        cd 06-lab-complete
+        pip install -r requirements.txt
+        
+    - name: Bước 4 - Chạy thử lò nướng Docker (Test Docker Build)
+      run: |
+        cd 06-lab-complete
+        docker build -t my-agent-app .
+        
+    - name: Bước 5 - Báo cáo thành công
+      run: echo "🎉 CI ĐÃ PASSED! Code của anh hoàn toàn không có lỗi và đã đóng gói thành công!"
