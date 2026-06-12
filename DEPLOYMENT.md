@@ -1,14 +1,14 @@
 # Deployment Information
 
 ## Public URL
-https://day12-deplayed-production.up.railway.app
+https://day12-project-production.up.railway.app/
 
 ## Platform
 Railway
 
 ## Test Instructions
 **1. Streamlit Web Application (Public UI)**
-- Open your web browser and navigate to: `https://day12-deplayed-production.up.railway.app`
+- Open your web browser and navigate to: `https://day12-project-production.up.railway.app`
 - Ensure the Chat UI loads successfully.
 - Try asking a question to verify the integrated RAG core is functioning.
 
