@@ -17,11 +17,11 @@ COPY --from=builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/pyth
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 
 COPY . /app/
+RUN chmod +x start.sh && chown -R appuser:appuser /app
 
-RUN chown -R appuser:appuser /app
 USER appuser
 
 ENV PYTHONPATH=/app
 
-# Default command (will be overridden by docker-compose)
-CMD ["python", "--version"]
+# Chạy script khởi động toàn bộ 5 server
+CMD ["./start.sh"]
