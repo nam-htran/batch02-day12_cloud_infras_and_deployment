@@ -7,28 +7,41 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-test:
+  build-06-lab:
+    name: Build 06-lab-complete
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Bước 1 - Lấy code về (Checkout Repository)
-      uses: actions/checkout@v4
-      
-    - name: Bước 2 - Cài đặt Python
+    - uses: actions/checkout@v4
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
-        
-    - name: Bước 3 - Kiểm tra thư viện (Install Dependencies)
+    - name: Kiểm tra thư viện
       run: |
         python -m pip install --upgrade pip
         cd 06-lab-complete
         pip install -r requirements.txt
-        
-    - name: Bước 4 - Chạy thử lò nướng Docker (Test Docker Build)
+    - name: Đóng gói Docker Image
       run: |
         cd 06-lab-complete
-        docker build -t my-agent-app .
-        
-    - name: Bước 5 - Báo cáo thành công
-      run: echo "🎉 CI ĐÃ PASSED! Code của anh hoàn toàn không có lỗi và đã đóng gói thành công!"
+        docker build -t app-06 .
+
+  build-06a-multi-agent:
+    name: Build 06a (A2A Multi-Agent)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    - name: Cài đặt công cụ UV
+      run: pip install uv
+    - name: Kiểm tra thư viện
+      run: |
+        cd 06a
+        uv pip install --system -r requirements.txt
+    - name: Đóng gói Docker Image chung
+      run: |
+        cd 06a
+        docker build -t app-06a .

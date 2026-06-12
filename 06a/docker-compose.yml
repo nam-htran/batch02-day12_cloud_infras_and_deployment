@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+  ui:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - A2A_SUPERVISOR_URL=http://supervisor:10100/generate
+    command: ["streamlit", "run", "group_project/app.py", "--server.address=0.0.0.0"]
+    depends_on:
+      - supervisor
+    restart: unless-stopped
+
+  supervisor:
+    build: .
+    ports:
+      - "10100:10100"
+    environment:
+      - RAG_URL=http://rag_agent:10101/generate
+      - WEB_URL=http://web_agent:10102/generate
+      - SYNTH_URL=http://synth_agent:10103/generate
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    command: ["uvicorn", "a2a_system.supervisor_agent:app", "--host", "0.0.0.0", "--port", "10100"]
+    depends_on:
+      - rag_agent
+      - web_agent
+      - synth_agent
+    restart: unless-stopped
+
+  rag_agent:
+    build: .
+    ports:
+      - "10101:10101"
+    environment:
+      - WEAVIATE_URL=http://weaviate:8080
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    command: ["uvicorn", "a2a_system.legal_rag_agent:app", "--host", "0.0.0.0", "--port", "10101"]
+    depends_on:
+      weaviate:
+        condition: service_started
+    restart: unless-stopped
+
+  web_agent:
+    build: .
+    ports:
+      - "10102:10102"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    command: ["uvicorn", "a2a_system.web_search_agent:app", "--host", "0.0.0.0", "--port", "10102"]
+    restart: unless-stopped
+
+  synth_agent:
+    build: .
+    ports:
+      - "10103:10103"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    command: ["uvicorn", "a2a_system.synthesizer_agent:app", "--host", "0.0.0.0", "--port", "10103"]
+    restart: unless-stopped
+
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.24.4
+    ports:
+      - "8080:8080"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 25
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none'
+      ENABLE_MODULES: 'text2vec-openai'
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    restart: unless-stopped
+
+volumes:
+  weaviate_data:
